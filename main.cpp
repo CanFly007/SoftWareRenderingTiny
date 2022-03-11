@@ -82,7 +82,8 @@ void triangle(Vec2i* pts, TGAImage& image, TGAColor color)
         {
             Vec3f bc_screen = barycentric(pts, P);
             if (bc_screen.x < 0 || bc_screen.y < 0 || bc_screen.z < 0) continue;
-            image.set(P.x, P.y, color);
+            //image.set(P.x, P.y, color);
+            image.set(P.x, P.y, TGAColor(bc_screen.x * 255, bc_screen.y * 255, bc_screen.z * 255, 255));
         }
     }
 }
