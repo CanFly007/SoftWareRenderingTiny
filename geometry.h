@@ -31,6 +31,10 @@ template<class t> struct Vec2
 	{
 		return Vec2<t>(u * f, v * f);
 	}
+	inline t operator ^(const Vec2<t>& v) const
+	{
+		return x * v.y - y * v.x;
+	}
 	template<class >friend std::ostream& operator<<(std::ostream& s, Vec2<t>& v);
 };
 
