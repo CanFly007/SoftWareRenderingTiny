@@ -7,9 +7,10 @@
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red = TGAColor(255, 0, 0, 255);
 const TGAColor green = TGAColor(0, 255, 0, 255);
+const TGAColor blue = TGAColor(0, 0, 255, 255);
 Model* model = NULL;
-const int width = 200;
-const int height = 200;
+const int width = 800;
+const int height = 500;
 
 void line(Vec2i p0, Vec2i p1, TGAImage& image, TGAColor color)
 {
@@ -125,8 +126,61 @@ void triangle(Vec2i t0, Vec2i t1, Vec2i t2, TGAImage& image, TGAColor color)
     }
 }
 
+void rasterize(Vec2i p0, Vec2i p1, TGAImage& image, TGAColor color, int ybuffer[])
+{
+    if (p0.x > p1.x)
+    {
+        std::swap(p0, p1);
+    }
+    for (int x = p0.x; x < p1.x; x++)
+    {
+        float t = (x - p0.x) / (float)(p1.x - p0.x);
+        int y = p0.y + t * (p1.y - p0.y) + 0.5;
+        if (ybuffer[x] < y)//更新ybuffer为y中最大值
+        {
+            ybuffer[x] = y;
+            image.set(x, 0, color);
+        }
+    }
+}
+
 int main(int argc, char** argv) 
 {
+    {
+        TGAImage render(width, 16, TGAImage::RGB);
+        int ybuffer[width];
+        for (int i = 0; i < width; i++)
+        {
+            ybuffer[i] = std::numeric_limits<int>::min();
+        }
+        rasterize(Vec2i(20, 34), Vec2i(744, 400), render, red, ybuffer);
+        //rasterize(Vec2i(120, 434), Vec2i(444, 400), render, green, ybuffer);
+        //rasterize(Vec2i(330, 463), Vec2i(594, 200), render, blue, ybuffer);
+
+        // 1-pixel wide image is bad for eyes, lets widen it
+        for (int i = 0; i < width; i++)
+            for (int j = 1; j < 16; j++)
+                render.set(i, j, render.get(i, 0));
+
+        render.flip_vertically();
+        render.write_tga_file("render.tga");
+    }
+    return 1;
+
+    {
+        TGAImage scene(width, height, TGAImage::RGB);
+
+        line(Vec2i(20, 34), Vec2i(744, 400), scene, red);
+        line(Vec2i(120, 434), Vec2i(444, 400), scene, green);
+        line(Vec2i(330, 463), Vec2i(594, 200), scene, blue);
+
+        line(Vec2i(10, 10), Vec2i(790, 10), scene, white);
+
+        scene.flip_vertically();
+        scene.write_tga_file("scene.tga");
+    }
+    return 1;
+
     if (2 == argc)
     {
         model = new Model(argv[1]);
