@@ -236,25 +236,19 @@ int main(int argc, char** argv)
     for (int i = 0; i < model->nfaces(); i++)
     {
         std::vector<int> face = model->face(i);
-        Vec3f pts[3];
-        for (int i = 0; i < 3; i++)
-            pts[i] = world2screen(model->vert(face[i]));
-        triangle(pts, zbuffer, image, TGAColor(rand() % 255, rand() % 255, rand() % 255, 255));
-
-        //Vec2i screen_coords[3];
-        //Vec3f world_coords[3];
-        //for (int j = 0; j < 3; j++)
-        //{
-        //    Vec3f v = model->vert(face[j]);
-        //    screen_coords[j] = Vec2i((v.x + 1.) * width / 2., (v.y + 1.) * height / 2.);
-        //    world_coords[j] = v;
-        //}
-        //Vec3f normal = (world_coords[2] - world_coords[0]) ^ (world_coords[1] - world_coords[0]);
-        //normal.normalize();
-        //float intensity = normal * light_dir;
-        //if (intensity > 0)
-        //    triangle(screen_coords[0], screen_coords[1], screen_coords[2], image, TGAColor(intensity * 255, intensity * 255, intensity * 255, 255));
-
+        Vec3f screen_coords[3];
+        Vec3f world_coords[3];
+        for (int j = 0; j < 3; j++)
+        {
+            screen_coords[j] = world2screen(model->vert(face[j]));
+            world_coords[j] = model->vert(face[j]);
+        }
+        //光照
+		Vec3f normal = (world_coords[2] - world_coords[0]) ^ (world_coords[1] - world_coords[0]);
+		normal.normalize();
+		float intensity = normal * light_dir;
+        if (intensity > 0)
+            triangle(screen_coords, zbuffer, image, TGAColor(intensity * 255, intensity * 255, intensity * 255, 255));
     }
     image.flip_vertically(); // i want to have the origin at the left bottom corner of the image
     image.write_tga_file("output.tga");
