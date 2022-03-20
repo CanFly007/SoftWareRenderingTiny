@@ -175,13 +175,13 @@ void triangle(Vec3f* pts, float* zbuffer,TGAImage& image,TGAColor color)
     {
         for (P.y = bboxmin.y; P.y <= bboxmax.y; P.y++)
         {
-            Vec3f bc_screen = barycentric(pts, P);//bc_screen是P点的重心坐标
+            Vec3f bc_screen = barycentric(pts, P);//bc_screen是P像素的重心坐标
             if (bc_screen.x < 0 || bc_screen.y < 0 || bc_screen.z < 0)
                 continue;
             P.z = 0;
             P.z += pts[0].z * bc_screen.x;
             P.z += pts[1].z * bc_screen.y;
-            P.z += pts[2].z * bc_screen.z;//这个是P点的z值
+            P.z += pts[2].z * bc_screen.z;//这个是P像素的z值
             //for (int i = 0; i < 3; i++)
             //    P.z += pts[i].z * bc_screen[i];//这个是P点的z值
 
